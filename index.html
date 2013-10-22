@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Validator Squared</title>
+
+        <style type="text/css">
+            body {
+                color: #444;
+                font-size: 200%;
+            }
+
+            header > h1 {
+                margin-bottom: 0;
+            }
+
+            header > h1 > sup {
+                color: #f80;
+            }
+
+            header > h2 {
+                color: #777;
+                margin-top: 0;
+            }
+
+            h1, h2 {
+                font-family: Helvetica, Arial, sans-serif;
+                font-weight: bold;
+                letter-spacing: -0.1ex;
+            }
+
+            input {
+                font-size: inherit;
+                width: 100%;
+                padding: 1ex 1em;
+                margin-bottom: 0;
+
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -o-box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+            }
+
+            #regex-error {
+                background-color: #800;
+                color: #fee;
+                height: 50px;
+                width: 100%;
+                line-height: 50px;
+                overflow: hidden;
+
+                transition: height 0.5s;
+                -moz-transition: height 0.5s;
+                -o-transition: height 0.5s;
+                -webkit-transition: height 0.5s;
+            }
+
+            #regex-error:empty {
+                height: 0;
+
+                transition: height 0.5s;
+                -moz-transition: height 0.5s;
+                -o-transition: height 0.5s;
+                -webkit-transition: height 0.5s;
+            }
+
+            h2 > small {
+                display: block;
+                color: #bbb;
+            }
+
+            ul {
+                list-style: none;
+                padding-left: 0;
+            }
+
+            ul > li {
+                font-size: 75%;
+                margin-bottom: 1ex;
+                word-wrap: break-word;
+            }
+
+            ul > li > aside {
+                display: block;
+                color: #888;
+                font-size: 80%;
+            }
+
+            [data-status="success"] {
+                background-color: #bfb;
+            }
+
+            [data-status="failure"] {
+                background-color: #fbb;
+            }
+
+            footer {
+                font-size: 12pt;
+                color: #888;
+            }
+
+            @media all and (min-width: 1024px) {
+                body {
+                    padding-bottom: 60px;
+                    text-align: center;
+                }
+
+                main {
+                    width: 65%;
+                    max-width: 1200px;
+                    margin: auto;
+                }
+
+                #examples {
+                    position: relative;
+                    overflow: expand;
+                }
+
+                #valid-examples {
+                    position: absolute;
+                    left: 0;
+                    right: 50%;
+                }
+
+                #valid-examples > ul {
+                    text-align: left;
+                }
+
+                #invalid-examples {
+                    position: absolute;
+                    left: 50%;
+                    right: 0;
+                }
+
+                #invalid-examples > ul {
+                    text-align: right;
+                }
+
+                footer {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    line-height: 50px;
+                    text-align: center;
+                    z-index: 1;
+
+                    background-color: #fff;
+                    opacity: 0.9;
+                    filter: alpha(opacity=90);
+                }
+            }
+        </style>
+
+        <script><!--
+            window.addEventListener('load', function() {
+                var validator       = document.querySelector('input[name="validator"]'),
+                    regexError      = document.getElementById('regex-error'),
+                    validExamples   = document.querySelectorAll('#valid-examples .valid-example'),
+                    invalidExamples = document.querySelectorAll('#invalid-examples .invalid-example');
+
+                function testExamples(regex, examples) {
+                    for (i = 0; i < examples.length; ++i) {
+                        (function(example) {
+                            if (regex.test(example.textContent)) {
+                                example.setAttribute('data-status', 'success');
+                            } else {
+                                example.setAttribute('data-status', 'failure');
+                            }
+                        }(examples[i]));
+                    }
+                }
+
+                function resetExamples(examples) {
+                    for (i = 0; i < examples.length; ++i) {
+                        examples[i].removeAttribute('data-status');
+                    }
+                }
+
+                function testValidation() {
+                    regexError.innerHTML = '';
+
+                    if ((/^\s*$/).test(validator.value)) {
+                        resetExamples(validExamples);
+                        resetExamples(invalidExamples);
+                        return;
+                    }
+
+                    var attempt = new RegExp(validator.value);
+                    testExamples(attempt, validExamples);
+                    testExamples(attempt, invalidExamples);
+                }
+
+                validator.addEventListener('keyup', testValidation);
+
+                window.addEventListener('error', function(e) {
+                    regexError.textContent = e.message;
+                });
+            });
+        --></script>
+    </head>
+
+    <body>
+        <main>
+            <header>
+                <h1>Validator<sup>2</sup>
+                <h2>The validator validator</h2>
+            </header>
+
+            <p>Okay, hot shot. You think your e-mail address validation is correct?</p>
+
+            <form>
+                <input type="text" name="validator" placeholder="for example: [a-z]+@[a-z]+.(?:com|net|org)" />
+            </form>
+
+            <div id="regex-error"></div>
+
+            <section id="examples">
+                <section id="valid-examples">
+                    <h2>
+                        These are valid
+                        <small>so they should be green</small>
+                    </h2>
+
+                    <ul>
+                        <li><span class="valid-example">niceandsimple@example.com</span></li>
+                        <li><span class="valid-example">very.common@example.com</span></li>
+                        <li><span class="valid-example">a.little.lengthy.but.fine@dept.example.com</span></li>
+                        <li><span class="valid-example">disposable.style.email.with+symbol@example.com</span></li>
+                        <li><span class="valid-example">user@[IPv6:2001:db8:1ff::a0b:dbd0]</span></li>
+                        <li><span class="valid-example">"much.more unusual"@example.com</span></li>
+                        <li><span class="valid-example">"very.unusual.@.unusual.com"@example.com</span></li>
+                        <li><span class="valid-example">"very.(),:;&lt;&gt;[]\".VERY.\"very@\\ \"very\".unusual"@strange.example.com</span></li>
+                        <li><span class="valid-example">postbox@com</span> <aside>top-level domains are valid hostnames</aside></li>
+                        <li><span class="valid-example">admin@mailserver1</span> <aside>local domain name with no TLD</aside></li>
+                        <li><span class="valid-example">!#$%&amp;'*+-/=?^_`{}|~@example.org</span></li>
+                        <li><span class="valid-example">"()&lt;&gt;[]:,;@\\\"!#$%&amp;'*+-/=?^_`{}| ~.a"@example.org</span></li>
+                        <li><span class="valid-example">" "@example.org</span> <aside>space between the quotes</aside></li>
+                        <li><span class="valid-example">üñîçøðé@example.com</span> <aside>Unicode characters in local part</aside></li>
+                    </ul>
+                </section>
+
+                <section id="invalid-examples">
+                    <h2>
+                        These are not
+                        <small>so they should be red</small>
+                    </h2>
+
+                    <ul>
+                        <li><span class="invalid-example">Abc.example.com</span> <aside>an @ character must separate the local and domain parts)</aside></li>
+                        <li><span class="invalid-example">A@b@c@example.com</span> <aside>only one @ is allowed outside quotation marks)</aside></li>
+                        <li><span class="invalid-example">a"b(c)d,e:f;g&lt;h&gt;i[j\k]l@example.com</span> <aside>none of the special characters in this local part are allowed outside quotation marks</aside></li>
+                        <li><span class="invalid-example">just"not"right@example.com</span> <aside>quoted strings must be dot separated, or the only element making up the local-part)</aside></li>
+                        <li><span class="invalid-example">this is"not\allowed@example.com</span> <aside>spaces, quotes, and backslashes may only exist when within quoted strings and preceded by a backslash)</aside></li>
+                        <li><span class="invalid-example">this\ still\"not\\allowed@example.com</span> <aside>even if escaped (preceded by a backslash), spaces, quotes, and backslashes must still be contained by quotes)</aside></li>
+                    </ul>
+                </section>
+            </section>
+
+            <footer>
+                Examples taken <a href="http://en.wikipedia.org/wiki/Email_address#Valid_email_addresses">from Wikipedia</a>.
+                Source code available <a href="https://github.com/dtao/validatorsquared">on GitHub</a>.
+            </footer>
+        </main>
+    </body>
+</html>
