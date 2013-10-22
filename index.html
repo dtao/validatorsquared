@@ -203,7 +203,12 @@
                         return;
                     }
 
-                    permalink.innerHTML = '<a href="/?regex=' + encodeURIComponent(validator.value) + '">Share this regex</a>';
+                    var url =
+                        window.location.protocol + '//' +
+                        window.location.hostname + window.location.pathname +
+                        '?regex=' + encodeURIComponent(validator.value);
+
+                    permalink.innerHTML = '<a href="' + url + '">Share this regex</a>';
 
                     var attempt = new RegExp(validator.value);
                     testExamples(attempt, validExamples);
