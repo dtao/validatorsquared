@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Validator Squared</title>
-        <meta name="viewport" content="width=device-width, user-scalable=false;">
+        <meta name="viewport" content="width=device-width, user-scalable=no">
 
         <style type="text/css">
             body {
@@ -62,6 +62,20 @@
                 -moz-transition: height 0.5s;
                 -o-transition: height 0.5s;
                 -webkit-transition: height 0.5s;
+            }
+
+            #permalink {
+                font-size: 50%;
+                text-align: right;
+            }
+
+            #permalink > a {
+                color: #789;
+                text-decoration: none;
+            }
+
+            #permalink > a:hover {
+                color: #456;
             }
 
             h2 > small {
@@ -157,6 +171,7 @@
             window.addEventListener('load', function() {
                 var validator       = document.querySelector('input[name="validator"]'),
                     regexError      = document.getElementById('regex-error'),
+                    permalink       = document.getElementById('permalink'),
                     validExamples   = document.querySelectorAll('#valid-examples .valid-example'),
                     invalidExamples = document.querySelectorAll('#invalid-examples .invalid-example');
 
@@ -180,6 +195,7 @@
 
                 function testValidation() {
                     regexError.innerHTML = '';
+                    permalink.innerHTML = '';
 
                     if ((/^\s*$/).test(validator.value)) {
                         resetExamples(validExamples);
@@ -187,16 +203,29 @@
                         return;
                     }
 
+                    permalink.innerHTML = '<a href="/?regex=' + encodeURIComponent(validator.value) + '">Share this regex</a>';
+
                     var attempt = new RegExp(validator.value);
                     testExamples(attempt, validExamples);
                     testExamples(attempt, invalidExamples);
                 }
 
+                function displayRegexError(e) {
+                    regexError.textContent = e.message;
+                }
+
+                // Listen to every keystroke
                 validator.addEventListener('keyup', testValidation);
 
-                window.addEventListener('error', function(e) {
-                    regexError.textContent = e.message;
-                });
+                // Display errors
+                window.addEventListener('error', displayRegexError);
+
+                // Pre-populate the input w/ the regex query param, if provided
+                var queryRegex = window.location.search.match(/regex=(.*)/);
+                if (queryRegex) {
+                    validator.value = decodeURIComponent(queryRegex[1]);
+                    testValidation();
+                }
             });
         --></script>
     </head>
@@ -215,6 +244,8 @@
             </form>
 
             <div id="regex-error"></div>
+
+            <div id="permalink"></div>
 
             <section id="examples">
                 <section id="valid-examples">
